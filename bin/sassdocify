@@ -92,18 +92,10 @@ DEST=${DEST:-.}
 
 p rm -rf .pages
 
-if ! git branch | grep -q gh-pages; then
-    readonly FIRST=1
-
-    # Make `gh-pages` branch.
-    p git clone . .pages
-    p gitc .pages checkout --orphan gh-pages
-    p gitc .pages remote set-url origin "$PUSH"
-    p gitc .pages rm -rf --ignore-unmatch . || :
-else
-    # Clone existing branch
-    p git clone -b gh-pages . .pages
-fi
+p git clone . .pages
+p gitc .pages remote set-url origin "$PUSH"
+p gitc .pages fetch origin gh-pages
+p gitc .pages checkout gh-pages
 
 # Recreate destination directory
 p gitc .pages rm -rf --ignore-unmatch "$DEST" || :
