@@ -87,6 +87,9 @@ SASSDOC=${SASSDOC:-sassdoc}
 # Push URL.
 readonly PUSH=$(git config --get remote.origin.url)
 
+# Destination directory
+DEST=${DEST:-.}
+
 p rm -rf .pages
 
 if ! git branch | grep -q gh-pages; then
@@ -96,13 +99,15 @@ if ! git branch | grep -q gh-pages; then
     p git clone . .pages
     p gitc .pages checkout --orphan gh-pages
     p gitc .pages remote set-url origin "$PUSH"
+    p gitc .pages rm -rf --ignore-unmatch . || :
 else
     # Clone existing branch
     p git clone -b gh-pages . .pages
 fi
 
-# Remove everything.
-p gitc .pages rm -rf --ignore-unmatch . || :
+# Recreate destination directory
+p gitc .pages rm -rf --ignore-unmatch "$DEST" || :
+p mkdir -p ".pages/$DEST"
 
 # Compile documentation.
 if $SASSDOC --version | grep -s '^1\.'; then
@@ -113,8 +118,8 @@ fi
 
 # Copy everything from documentation into pages directory and track.
 for file in $(cd .sassdoc && echo ./*); do
-    p cp -R ".sassdoc/$file" .pages
-    p gitc .pages add "$file"
+    p cp -R ".sassdoc/$file" ".pages/$DEST"
+    p gitc .pages add "$DEST/$file"
 done
 
 # Commit if files were modified or added.
