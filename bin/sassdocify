@@ -92,10 +92,7 @@ DEST=${DEST:-.}
 
 p rm -rf .pages
 
-p git clone . .pages
-p gitc .pages remote set-url origin "$PUSH"
-p gitc .pages fetch origin gh-pages
-p gitc .pages checkout gh-pages
+p git clone -b gh-pages "$PUSH" .pages
 
 # Recreate destination directory
 p gitc .pages rm -rf --ignore-unmatch "$DEST" || :
